@@ -11,8 +11,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_PATH = process.env.DB_PATH || './inventory.db';
 
-// --- Database Connection and Schema ---
-
+/**
+ * SQL Schema for creating required database tables.
+ *
+ * - `products`: Stores product details and inventory stock.
+ * - `inventory_logs`: Maintains stock change history with timestamps.
+ *
+ * Tables are created only if they do not already exist.
+ *
+ * @constant
+ * @type {string}
+ */
 const CREATE_TABLES_SQL = `
     CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,6 +47,17 @@ const CREATE_TABLES_SQL = `
     );
 `;
 
+/**
+ * Establishes a connection to the SQLite database and initializes tables.
+ *
+ * @async
+ * @function connectDB
+ * @returns {Promise<import('sqlite').Database>} The SQLite database instance.
+ * @throws {Error} When database connection or table initialization fails.
+ *
+ * @example
+ * const db = await connectDB();
+ */
 const connectDB = async () => {
     try {
         const db = await open({
@@ -55,30 +75,51 @@ const connectDB = async () => {
     }
 };
 
-// --- Server Startup Logic ---
+// --- Express Middleware ---
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Middleware
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
-
+/**
+ * Starts the Express server after the database has been initialized.
+ *
+ * Responsibilities:
+ * - Connect to SQLite database
+ * - Register authentication and product routes
+ * - Handle undefined routes (404)
+ * - Attach global error handler
+ * - Start HTTP server
+ *
+ * @async
+ * @function startServer
+ * @returns {Promise<void>}
+ *
+ * @example
+ * startServer();
+ */
 const startServer = async () => {
     try {
         const db = await connectDB();
         
-        // 1. Auth Route (Login)
-        app.use('/api/auth', authRouter); 
+        // Authentication Routes
+        app.use('/api/auth', authRouter);
         
-        // 2. Product Routes (Requires DB injection)
+        // Product Routes (with DB injection)
         app.use('/api/products', createProductRouter(db));
         
-        // 3. Handle unhandled routes (404)
-            app.use((req, res, next) => {
+        /**
+         * Handles undefined routes and forwards to the global error handler.
+         *
+         * @example
+         * GET /unknown-route → 404
+         */
+        app.use((req, res, next) => {
             next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
         });
 
-        // 4. Global Error Handler (must be the last middleware)
+        // Global Error Handler (must be last)
         app.use(globalErrorHandler);
 
+        // Start listening for HTTP requests
         app.listen(PORT, () => {
             console.log(`🚀 Server running on http://localhost:${PORT}`);
         });
