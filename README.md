@@ -113,8 +113,8 @@ Notes:
 
 **Default / Example Login Credentials**
 
-- Email: `admin@example.com`
-- Password: `admin123`
+- User Name: `admin@inventory.com`
+- Password: `securepassword123`
 
 Place these in `backend/.env` as `ADMIN_EMAIL` and `ADMIN_PASSWORD` (or create a user with those credentials using the API).
 
