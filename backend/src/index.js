@@ -107,6 +107,12 @@ const startServer = async () => {
         app.get('/favicon.ico', (req, res) => res.status(204).end());
 
         /**
+         * 👉 Handle /ws probe (some platforms or tools call /ws)
+         * Respond with 204 No Content instead of letting it trigger the 404 handler.
+         */
+        app.get('/ws', (req, res) => res.status(204).end());
+
+        /**
          * Undefined route handler (404)
          */
         app.use((req, res, next) => {
