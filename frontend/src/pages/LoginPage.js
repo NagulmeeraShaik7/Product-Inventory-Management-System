@@ -15,14 +15,18 @@ export default function LoginPage() {
     
     const payload = { username, password };
     const endpoints = [`${API_ROOT}/api/auth/login`, `${API_ROOT}/api/auth`];
+    // Use urlencoded body to avoid CORS preflight (OPTIONS) in some environments
+    const body = new URLSearchParams(payload);
     let data = null;
     
     try {
       for (const ep of endpoints) {
         const res = await fetch(ep, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          // omit custom Content-Type header so the browser sets
+          // `application/x-www-form-urlencoded` automatically and
+          // the request is a "simple" CORS request (no preflight).
+          body,
         });
         if (!res.ok) continue;
         data = await res.json();
