@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import ProductController from '../controllers/Product.controller.js';
+import ProductController from '../controllers/product.controller.js';
 import ProductUseCase from '../usecases/product.usecase.js';
 import ProductRepository from '../repositories/product.repository.js';
 import InventoryLogRepository from '../repositories/inventory-log.repository.js';
