@@ -66,22 +66,13 @@ const connectDB = async () => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS configuration: allow localhost during development and the production URL
-const PROD_URL = process.env.PRODUCTION_URL || 'https://product-inventory-management-system-37hp.onrender.com';
-const allowedOrigins = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    PROD_URL,
-];
-
+// CORS configuration: allow any origin by reflecting the request origin.
+// This supports browsers sending credentials while still allowing any domain.
 app.use(cors({
-    origin: (origin, callback) => {
-        // allow requests with no origin (e.g., mobile apps, curl)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) return callback(null, true);
-        return callback(new Error('CORS policy: This origin is not allowed.'));
-    },
+    origin: true,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
 }));
 
 /**
