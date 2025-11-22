@@ -13,14 +13,6 @@ const DB_PATH = process.env.DB_PATH || './inventory.db';
 
 /**
  * SQL Schema for creating required database tables.
- *
- * - `products`: Stores product details and inventory stock.
- * - `inventory_logs`: Maintains stock change history with timestamps.
- *
- * Tables are created only if they do not already exist.
- *
- * @constant
- * @type {string}
  */
 const CREATE_TABLES_SQL = `
     CREATE TABLE IF NOT EXISTS products (
@@ -49,14 +41,6 @@ const CREATE_TABLES_SQL = `
 
 /**
  * Establishes a connection to the SQLite database and initializes tables.
- *
- * @async
- * @function connectDB
- * @returns {Promise<import('sqlite').Database>} The SQLite database instance.
- * @throws {Error} When database connection or table initialization fails.
- *
- * @example
- * const db = await connectDB();
  */
 const connectDB = async () => {
     try {
@@ -81,20 +65,6 @@ app.use(express.urlencoded({ extended: true }));
 
 /**
  * Starts the Express server after the database has been initialized.
- *
- * Responsibilities:
- * - Connect to SQLite database
- * - Register authentication and product routes
- * - Handle undefined routes (404)
- * - Attach global error handler
- * - Start HTTP server
- *
- * @async
- * @function startServer
- * @returns {Promise<void>}
- *
- * @example
- * startServer();
  */
 const startServer = async () => {
     try {
@@ -105,12 +75,24 @@ const startServer = async () => {
         
         // Product Routes (with DB injection)
         app.use('/api/products', createProductRouter(db));
-        
+
         /**
-         * Handles undefined routes and forwards to the global error handler.
-         *
-         * @example
-         * GET /unknown-route → 404
+         * 👉 Root route (Fix for Render health checks)
+         */
+        app.get('/', (req, res) => {
+            res.status(200).json({
+                status: 'success',
+                message: 'Inventory Management API is running!'
+            });
+        });
+
+        /**
+         * 👉 Prevent favicon 404 spam
+         */
+        app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+        /**
+         * Undefined route handler (404)
          */
         app.use((req, res, next) => {
             next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
@@ -119,7 +101,7 @@ const startServer = async () => {
         // Global Error Handler (must be last)
         app.use(globalErrorHandler);
 
-        // Start listening for HTTP requests
+        // Start HTTP Server
         app.listen(PORT, () => {
             console.log(`🚀 Server running on http://localhost:${PORT}`);
         });
