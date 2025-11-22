@@ -1,17 +1,8 @@
 import { signToken } from '../utils/auth.util.js';
 import { AppError } from '../utils/error-handler.js';
 
-/**
- * Admin username loaded from environment variables.
- * @type {string}
- */
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
-
-/**
- * Admin password loaded from environment variables.
- * @type {string}
- */
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+// Note: ADMIN credentials are read at runtime inside the handler to allow tests
+// to modify process.env before invoking the controller.
 
 /**
  * Controller responsible for authentication-related operations.
@@ -59,7 +50,10 @@ class AuthController {
             /**
              * Static credential validation.
              * In production, replace with DB user check + hashed password comparison (bcrypt).
+             * Read env vars at runtime so tests can modify process.env before invoking this method.
              */
+            const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+            const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
             const isMatch = (username === ADMIN_USERNAME && password === ADMIN_PASSWORD);
 
             if (!isMatch) {
