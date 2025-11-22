@@ -13,7 +13,7 @@ const authController = new AuthController();
 
 /**
  * @swagger
- * /auth/login:
+ * /api/auth/login:
  *   post:
  *     summary: User login and JWT token generation
  *     tags: [Authentication]

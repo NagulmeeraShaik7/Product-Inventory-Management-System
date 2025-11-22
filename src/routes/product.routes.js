@@ -61,7 +61,7 @@ import { protect } from '../middlewares/auth.middleware.js';
 
 /**
  * @swagger
- * /products/import:
+ * /api/products/import:
  *   post:
  *     summary: Import products via CSV
  *     description: Upload a CSV file to bulk-import new products. Duplicate names (case-insensitive) will be skipped.
@@ -103,7 +103,7 @@ import { protect } from '../middlewares/auth.middleware.js';
 
 /**
  * @swagger
- * /products/export:
+ * /api/products/export:
  *   get:
  *     summary: Export all products to a CSV file
  *     tags: [Products]
@@ -119,7 +119,7 @@ import { protect } from '../middlewares/auth.middleware.js';
 
 /**
  * @swagger
- * /products:
+ * /api/products:
  *   get:
  *     summary: Get all products with pagination, search, and sorting
  *     tags: [Products]
@@ -173,7 +173,7 @@ import { protect } from '../middlewares/auth.middleware.js';
 
 /**
  * @swagger
- * /products/{id}:
+ * /api/products/{id}:
  *   put:
  *     summary: Update an existing product
  *     tags: [Products]
@@ -208,7 +208,7 @@ import { protect } from '../middlewares/auth.middleware.js';
 
 /**
  * @swagger
- * /products/{id}/history:
+ * /api/products/{id}/history:
  *   get:
  *     summary: Get inventory change history for a product
  *     tags: [Products]
