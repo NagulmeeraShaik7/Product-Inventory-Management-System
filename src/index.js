@@ -6,6 +6,9 @@ import { open } from 'sqlite';
 import createProductRouter from './routes/product.routes.js';
 import authRouter from './routes/auth.routes.js';
 import { globalErrorHandler, AppError } from './utils/error-handler.js';
+import cors from 'cors';
+// Swagger setup
+import { setupSwagger } from './infrastructures/config/swagger.config.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -63,6 +66,24 @@ const connectDB = async () => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// CORS configuration: allow localhost during development and the production URL
+const PROD_URL = process.env.PRODUCTION_URL || 'https://product-inventory-management-system-37hp.onrender.com';
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    PROD_URL,
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // allow requests with no origin (e.g., mobile apps, curl)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error('CORS policy: This origin is not allowed.'));
+    },
+    credentials: true,
+}));
+
 /**
  * Starts the Express server after the database has been initialized.
  */
@@ -75,6 +96,9 @@ const startServer = async () => {
         
         // Product Routes (with DB injection)
         app.use('/api/products', createProductRouter(db));
+
+        // Swagger UI (mount before 404 handler)
+        setupSwagger(app, process.env.SWAGGER_PATH || '/api-docs');
 
         /**
          * 👉 Root route (Fix for Render health checks)
